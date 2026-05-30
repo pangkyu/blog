@@ -1,48 +1,46 @@
 // @ts-check
 
-import mdx from '@astrojs/mdx';
-import react from '@astrojs/react';
-import sitemap from '@astrojs/sitemap';
-import { defineConfig, fontProviders } from 'astro/config';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
-import rehypeSlug from 'rehype-slug';
-import tailwindcss from '@tailwindcss/vite';
+import mdx from "@astrojs/mdx";
+import react from "@astrojs/react";
+import sitemap from "@astrojs/sitemap";
+import { defineConfig, fontProviders } from "astro/config";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeSlug from "rehype-slug";
+import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.github.io', // TODO: GitHub username으로 변경
+  site: "https://pangkyu.github.io", // TODO: GitHub 유저명으로 변경
+  base: "/blog",
   integrations: [mdx(), sitemap(), react()],
 
   markdown: {
     shikiConfig: {
-      theme: 'github-dark',
+      theme: "github-dark",
       wrap: true,
     },
-    rehypePlugins: [
-      rehypeSlug,
-      [rehypeAutolinkHeadings, { behavior: 'wrap' }],
-    ],
+    rehypePlugins: [rehypeSlug, [rehypeAutolinkHeadings, { behavior: "wrap" }]],
   },
 
   fonts: [
     {
       provider: fontProviders.local(),
-      name: 'Atkinson',
-      cssVariable: '--font-atkinson',
-      fallbacks: ['sans-serif'],
+      name: "Atkinson",
+      cssVariable: "--font-atkinson",
+      fallbacks: ["sans-serif"],
       options: {
         variants: [
           {
-            src: ['./src/assets/fonts/atkinson-regular.woff'],
+            src: ["./src/assets/fonts/atkinson-regular.woff"],
             weight: 400,
-            style: 'normal',
-            display: 'swap',
+            style: "normal",
+            display: "swap",
           },
           {
-            src: ['./src/assets/fonts/atkinson-bold.woff'],
+            src: ["./src/assets/fonts/atkinson-bold.woff"],
             weight: 700,
-            style: 'normal',
-            display: 'swap',
+            style: "normal",
+            display: "swap",
           },
         ],
       },
