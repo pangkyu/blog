@@ -1,0 +1,156 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	const seriesSet = new Set(posts.map((p) => p.data.series).filter(Boolean) as string[]);
+	return [...seriesSet].map((series) => ({
+		params: { series },
+		props: { series },
+	}));
+}
+
+const { series } = Astro.props;
+const posts = (await getCollection('blog'))
+	.filter((p) => p.data.series === series)
+	.sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={`${series} | ${SITE_TITLE}`} description={`${series} 시리즈`} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb">
+				<a href={`${base}/series`}>Series</a>
+				<span>/</span>
+				<span>{series}</span>
+			</div>
+			<h1>{series}</h1>
+			<p class="count">{posts.length}편</p>
+			<ol>
+				{posts.map((post, i) => (
+					<li>
+						<a href={`${base}/posts/${post.id}/`}>
+							<span class="num">{i + 1}</span>
+							<div class="info">
+								<span class="title">{post.data.title}</span>
+								{post.data.description && (
+									<span class="desc">{post.data.description}</span>
+								)}
+							</div>
+							<span class="date"><FormattedDate date={post.data.pubDate} /></span>
+						</a>
+					</li>
+				))}
+			</ol>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	main {
+		max-width: 680px;
+		margin: 0 auto;
+		padding: 3rem 1.5rem;
+	}
+
+	.breadcrumb {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.85rem;
+		color: var(--color-text-muted);
+		margin-bottom: 1.25rem;
+	}
+
+	.breadcrumb a {
+		color: var(--color-primary);
+		text-decoration: none;
+	}
+
+	.breadcrumb a:hover {
+		text-decoration: underline;
+	}
+
+	h1 {
+		font-size: 1.75rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		margin: 0 0 0.35rem;
+	}
+
+	.count {
+		font-size: 0.85rem;
+		color: var(--color-text-muted);
+		margin: 0 0 2rem;
+	}
+
+	ol {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	li a {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.9rem 0;
+		border-bottom: 1px solid var(--color-border);
+		text-decoration: none;
+		color: var(--color-text);
+	}
+
+	li a:hover .title {
+		color: var(--color-primary);
+	}
+
+	.num {
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
+		min-width: 1.25rem;
+		text-align: right;
+		flex-shrink: 0;
+	}
+
+	.info {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+		min-width: 0;
+	}
+
+	.title {
+		font-size: 0.95rem;
+		font-weight: 600;
+		transition: color 0.15s;
+	}
+
+	.desc {
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.date {
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+</style>

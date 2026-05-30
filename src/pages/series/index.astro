@@ -1,0 +1,97 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const posts = await getCollection('blog');
+
+const seriesMap = new Map<string, number>();
+for (const post of posts) {
+	if (post.data.series) {
+		seriesMap.set(post.data.series, (seriesMap.get(post.data.series) ?? 0) + 1);
+	}
+}
+const seriesList = [...seriesMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={`Series | ${SITE_TITLE}`} description="시리즈 목록" />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Series</h1>
+			{seriesList.length === 0 ? (
+				<p class="empty">아직 시리즈가 없습니다.</p>
+			) : (
+				<ul>
+					{seriesList.map(([name, count]) => (
+						<li>
+							<a href={`${base}/series/${name}`}>
+								<span class="name">{name}</span>
+								<span class="count">{count}편</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	main {
+		max-width: 680px;
+		margin: 0 auto;
+		padding: 3rem 1.5rem;
+	}
+
+	h1 {
+		font-size: 1.75rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		margin: 0 0 2rem;
+	}
+
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	li a {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1rem 0;
+		border-bottom: 1px solid var(--color-border);
+		text-decoration: none;
+		color: var(--color-text);
+		transition: color 0.15s;
+	}
+
+	li a:hover .name {
+		color: var(--color-primary);
+	}
+
+	.name {
+		font-size: 1rem;
+		font-weight: 600;
+		transition: color 0.15s;
+	}
+
+	.count {
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
+	}
+
+	.empty {
+		color: var(--color-text-muted);
+	}
+</style>

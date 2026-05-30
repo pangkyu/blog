@@ -1,15 +1,23 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Comments from '../components/Comments';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<'blog'>['data'] & { id?: string };
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, series, seriesOrder, id } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const seriesPosts = series
+	? (await getCollection('blog'))
+			.filter((p) => p.data.series === series)
+			.sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0))
+	: [];
 ---
 
 <html lang="ko">
@@ -39,6 +47,27 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 					<hr />
 					<slot />
 				</div>
+
+				{seriesPosts.length > 0 && (
+					<div class="series-panel">
+						<div class="series-header">
+							<span class="series-label">시리즈</span>
+							<a href={`${base}/series/${series}`} class="series-name">{series}</a>
+						</div>
+						<ol class="series-list">
+							{seriesPosts.map((p) => (
+								<li class:list={[{ current: p.id === id }]}>
+									{p.id === id ? (
+										<span class="series-item-current">{p.data.title}</span>
+									) : (
+										<a href={`${base}/posts/${p.id}/`}>{p.data.title}</a>
+									)}
+								</li>
+							))}
+						</ol>
+					</div>
+				)}
+
 				<div class="comments">
 					<Comments client:load />
 				</div>
@@ -105,6 +134,81 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		border: none;
 		border-top: 1px solid var(--color-border);
 		margin: 1.5rem 0 2rem;
+	}
+
+	.series-panel {
+		margin-top: 3rem;
+		padding: 1.25rem 1.5rem;
+		background-color: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: 10px;
+	}
+
+	.series-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.series-label {
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-text-muted);
+	}
+
+	.series-name {
+		font-size: 0.9rem;
+		font-weight: 700;
+		color: var(--color-primary);
+		text-decoration: none;
+	}
+
+	.series-name:hover {
+		text-decoration: underline;
+	}
+
+	.series-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		counter-reset: series-counter;
+	}
+
+	.series-list li {
+		counter-increment: series-counter;
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		font-size: 0.9rem;
+	}
+
+	.series-list li::before {
+		content: counter(series-counter);
+		font-size: 0.75rem;
+		color: var(--color-text-muted);
+		min-width: 1rem;
+		text-align: right;
+		flex-shrink: 0;
+	}
+
+	.series-list li a {
+		color: var(--color-text);
+		text-decoration: none;
+	}
+
+	.series-list li a:hover {
+		color: var(--color-primary);
+	}
+
+	.series-list li.current .series-item-current {
+		color: var(--color-primary);
+		font-weight: 600;
 	}
 
 	.comments {
