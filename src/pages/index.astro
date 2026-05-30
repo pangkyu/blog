@@ -1,49 +1,189 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { GITHUB_URL, SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const recentPosts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 5);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+			<section class="hero">
+				<p class="greeting">안녕하세요,</p>
+				<h1>{SITE_AUTHOR}입니다.</h1>
+				<p class="bio">{SITE_DESCRIPTION}</p>
+				<div class="hero-links">
+					<a href={`${base}/posts`} class="btn-primary">글 목록 보기</a>
+					<a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub</a>
+				</div>
+			</section>
+
+			{recentPosts.length > 0 && (
+				<section class="recent">
+					<h2>최근 글</h2>
+					<ul>
+						{recentPosts.map((post) => (
+							<li>
+								<a href={`${base}/posts/${post.id}/`}>
+									<span class="post-title">{post.data.title}</span>
+									<span class="post-date"><FormattedDate date={post.data.pubDate} /></span>
+								</a>
+							</li>
+						))}
+					</ul>
+					<a href={`${base}/posts`} class="more-link">모든 글 보기 →</a>
+				</section>
+			)}
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	main {
+		max-width: 680px;
+		margin: 0 auto;
+		padding: 0 1.5rem;
+	}
+
+	.hero {
+		padding: 5rem 0 4rem;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.greeting {
+		font-size: 1.1rem;
+		color: var(--color-primary);
+		font-weight: 500;
+		margin: 0 0 0.5rem;
+	}
+
+	h1 {
+		font-size: clamp(2rem, 5vw, 3rem);
+		font-weight: 800;
+		line-height: 1.15;
+		letter-spacing: -0.03em;
+		margin: 0 0 1.25rem;
+		color: var(--color-text);
+	}
+
+	.bio {
+		font-size: 1.1rem;
+		color: var(--color-text-muted);
+		line-height: 1.7;
+		margin: 0 0 2rem;
+		max-width: 480px;
+	}
+
+	.hero-links {
+		display: flex;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.btn-primary {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.6rem 1.25rem;
+		background-color: var(--color-primary);
+		color: #fff;
+		border-radius: 8px;
+		font-size: 0.9rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition: background-color 0.15s;
+	}
+
+	.btn-primary:hover {
+		background-color: var(--color-primary-hover);
+	}
+
+	.btn-secondary {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.6rem 1.25rem;
+		background-color: var(--color-surface);
+		color: var(--color-text);
+		border-radius: 8px;
+		font-size: 0.9rem;
+		font-weight: 600;
+		text-decoration: none;
+		border: 1px solid var(--color-border);
+		transition: background-color 0.15s;
+	}
+
+	.btn-secondary:hover {
+		background-color: var(--color-border);
+	}
+
+	.recent {
+		padding: 3rem 0;
+	}
+
+	h2 {
+		font-size: 1rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-text-muted);
+		margin: 0 0 1.25rem;
+	}
+
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0 0 1.5rem;
+	}
+
+	li a {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1rem;
+		padding: 0.75rem 0;
+		border-bottom: 1px solid var(--color-border);
+		text-decoration: none;
+		color: var(--color-text);
+		transition: color 0.15s;
+	}
+
+	li a:hover .post-title {
+		color: var(--color-primary);
+	}
+
+	.post-title {
+		font-size: 0.95rem;
+		font-weight: 500;
+		transition: color 0.15s;
+	}
+
+	.post-date {
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+
+	.more-link {
+		font-size: 0.9rem;
+		color: var(--color-primary);
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	.more-link:hover {
+		text-decoration: underline;
+	}
+</style>
