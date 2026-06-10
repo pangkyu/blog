@@ -21,12 +21,20 @@ const recentPosts = (await getCollection('blog'))
 		<Header />
 		<main>
 			<section class="hero">
-				<p class="greeting">안녕하세요,</p>
-				<h1>{SITE_AUTHOR}입니다.</h1>
-				<p class="bio">{SITE_DESCRIPTION}</p>
-				<div class="hero-links">
-					<a href={`${base}/posts`} class="btn-primary">글 목록 보기</a>
-					<a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub</a>
+				<div class="hero-text">
+					<p class="greeting">안녕하세요,</p>
+					<h1>{SITE_AUTHOR}입니다.</h1>
+					<p class="bio">{SITE_DESCRIPTION}</p>
+					<div class="hero-links">
+						<a href={`${base}/posts`} class="btn-primary">글 목록 보기</a>
+						<a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub</a>
+					</div>
+				</div>
+				<div class="hero-avatar">
+					<img src={`${base}/profile.jpg`} alt={SITE_AUTHOR} onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+					<div class="avatar-placeholder">
+						{SITE_AUTHOR.charAt(0)}
+					</div>
 				</div>
 			</section>
 
@@ -59,8 +67,40 @@ const recentPosts = (await getCollection('blog'))
 	}
 
 	.hero {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 2rem;
 		padding: 5rem 0 4rem;
 		border-bottom: 1px solid var(--color-border);
+	}
+
+	.hero-text {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.hero-avatar {
+		flex-shrink: 0;
+	}
+
+	.hero-avatar img,
+	.avatar-placeholder {
+		width: 120px;
+		height: 120px;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+
+	.avatar-placeholder {
+		display: none;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--color-surface);
+		border: 2px dashed var(--color-border);
+		font-size: 2.5rem;
+		font-weight: 700;
+		color: var(--color-text-muted);
 	}
 
 	.greeting {
@@ -84,13 +124,26 @@ const recentPosts = (await getCollection('blog'))
 		color: var(--color-text-muted);
 		line-height: 1.7;
 		margin: 0 0 2rem;
-		max-width: 480px;
 	}
 
 	.hero-links {
 		display: flex;
 		gap: 0.75rem;
 		flex-wrap: wrap;
+	}
+
+	@media (max-width: 480px) {
+		.hero {
+			padding: 2.5rem 0 2rem;
+			gap: 1.25rem;
+		}
+
+		.hero-avatar img,
+		.avatar-placeholder {
+			width: 80px;
+			height: 80px;
+			font-size: 1.75rem;
+		}
 	}
 
 	.btn-primary {
