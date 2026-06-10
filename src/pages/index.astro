@@ -4,7 +4,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
-import { GITHUB_URL, SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { GITHUB_URL, SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE, OLD_BLOG_URL } from '../consts';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const recentPosts = (await getCollection('blog'))
@@ -25,9 +25,11 @@ const recentPosts = (await getCollection('blog'))
 					<p class="greeting">안녕하세요,</p>
 					<h1>{SITE_AUTHOR}입니다.</h1>
 					<p class="bio">{SITE_DESCRIPTION}</p>
+
 					<div class="hero-links">
 						<a href={`${base}/posts`} class="btn-primary">글 목록 보기</a>
 						<a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub</a>
+						<a href={OLD_BLOG_URL} target="_blank" rel="noopener noreferrer" class="btn-secondary">(구)벨로그</a>
 					</div>
 				</div>
 				<div class="hero-avatar">
