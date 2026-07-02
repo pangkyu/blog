@@ -8,9 +8,9 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 
-type Props = Omit<CollectionEntry<'blog'>['data'], 'pubDate'> & { id?: string; pubDate?: Date; hideDivider?: boolean };
+type Props = Omit<CollectionEntry<'blog'>['data'], 'pubDate'> & { id?: string; pubDate?: Date; hideDivider?: boolean; hideDescription?: boolean };
 
-const { title, description, pubDate, updatedDate, heroImage, series, seriesOrder, id, hideDivider } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, series, seriesOrder, id, hideDivider, hideDescription } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const seriesPosts = series
@@ -44,7 +44,7 @@ const seriesPosts = series
 							</div>
 						)}
 						<h1>{title}</h1>
-						{description && <p class="description">{description}</p>}
+						{description && !hideDescription && <p class="description">{description}</p>}
 					</header>
 					{!hideDivider && <hr />}
 					<slot />
